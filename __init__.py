@@ -1,5 +1,4 @@
-__all__ = ["angle", "ellipse", "rect"]
+__all__ = ["angle", "ellipse"]
 
 from .angle import *
 from .ellipse import *
-from .rect import *
