@@ -28,3 +28,44 @@ def from_homogeneous(homogeneous_coords: ArrayLike) -> NDArray:
     homogeneous_coords = np.asarray(homogeneous_coords)
 
     return homogeneous_coords[:,:-1]
+
+class Affine2DTransform():
+    
+    @staticmethod
+    def identity() -> NDArray:
+        I = np.array([
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],        
+        ])
+        return I
+
+    @staticmethod
+    def translation(tx: float, ty: float) -> NDArray:
+        T = np.array([
+            [1.0, 0.0,  tx],
+            [0.0, 1.0,  ty],
+            [0.0, 0.0, 1.0],        
+        ])
+        return T
+
+    @staticmethod
+    def rotation(angle_rad: float) -> NDArray:
+        c = np.cos(angle_rad)
+        s = np.sin(angle_rad)
+        R = np.array([
+            [c,    -s, 0.0],
+            [s,     c, 0.0],
+            [0.0, 0.0, 1.0]
+        ])
+        return R
+
+    @staticmethod
+    def scaling(sx: float, sy:float) -> NDArray:
+        S = np.array([
+            [ sx, 0.0, 0.0],
+            [0.0,  sy, 0.0],
+            [0.0, 0.0, 1.0]
+        ])
+        return S
+    
