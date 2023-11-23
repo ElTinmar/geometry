@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import inv
 from numpy.typing import NDArray, ArrayLike
 
 def to_homogeneous(input_coords: ArrayLike) -> NDArray:
@@ -68,4 +69,8 @@ class Affine2DTransform():
             [0.0, 0.0, 1.0]
         ])
         return S
+
+    @staticmethod
+    def inverse(T: NDArray) -> NDArray:
+        return inv(T)
     
