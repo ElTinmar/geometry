@@ -4,8 +4,13 @@ from numpy.typing import NDArray
 def col_to_row(col: NDArray) -> NDArray:
     
     shp = col.shape
+
+    if len(shp) == 1:
+        # make it explicitly a column vector
+        col = col[:, np.newaxis]
+        shp = col.shape
     
-    if (len(shp) > 2) or (shp[1] > 1):
+    elif (len(shp) > 2) or (shp[1] > 1):
         raise ValueError('not a column vector')
     
     return col.reshape(1, -1)
