@@ -18,8 +18,11 @@ def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     
     # add a column of ones
     n = shp[0]
-    new_colum = np.ones((n,1))
-    homogeneous_coords = np.hstack((input_coords, new_colum))
+    if n == 1:
+        homogeneous_coords = np.append(input_coords,1)
+    else:
+        new_colum = np.ones((n,1))
+        homogeneous_coords = np.hstack((input_coords, new_colum))
     
     return homogeneous_coords
 
