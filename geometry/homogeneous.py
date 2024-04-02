@@ -18,7 +18,7 @@ def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     
     # add a column of ones
     n = shp[0]
-    if n == 1:
+    if len(shp) == 1:
         homogeneous_coords = np.append(input_coords,1)
     else:
         new_colum = np.ones((n,1))
