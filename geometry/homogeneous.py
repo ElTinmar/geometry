@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy.typing import NDArray, ArrayLike
+from vector import row_to_col, col_to_row
 
 def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     '''
@@ -31,7 +32,7 @@ def from_homogeneous(homogeneous_coords: ArrayLike) -> NDArray:
     # transform to numpy array
     homogeneous_coords = np.asarray(homogeneous_coords)
 
-    return homogeneous_coords[:,:-1]
+    return homogeneous_coords[:,:-1]    
 
 class Affine2DTransform():
     
@@ -77,3 +78,26 @@ class Affine2DTransform():
     def inverse(T: NDArray) -> NDArray:
         return inv(T)
     
+def transform2d(T: Affine2DTransform, x: NDArray):
+    '''
+    input: x is an array with shape (2,) , (1,2) or (N,2)
+    output: returns an array with shape (1,2) or (N,2) 
+    '''
+    
+    shp = x.shape
+
+    if len(shp) == 1 and shp[0] == 2:
+        # make it explicitly a 1x2 row vector 
+        x = x[np.newaxis,:]
+
+    elif len(shp) == 2 and shp[1] == 2:
+        # Nx2 array, nothing to do
+        pass
+
+    else:
+        return ValueError('Wrong shape, please provide an array with shape (2,) , (1,2) or (N,2)')
+
+    x_homogeneous = to_homogeneous(x)
+    y_homogeneous = T @ x_homogeneous.T
+    return from_homogeneous(y_homogeneous.T)
+

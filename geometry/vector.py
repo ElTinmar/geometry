@@ -18,6 +18,11 @@ def col_to_row(col: NDArray) -> NDArray:
 def row_to_col(row: NDArray) -> NDArray:
     
     shp = row.shape
+
+    if len(shp) == 1:
+        # make it explicitly a row vector
+        row = row[np.newaxis,:]
+        shp = row.shape
     
     if (len(shp) > 2) or (shp[0] > 1):
         raise ValueError('not a row vector')
