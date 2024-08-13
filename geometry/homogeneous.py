@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy.typing import NDArray, ArrayLike
-from vector import row_to_col, col_to_row
 
 def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     '''
