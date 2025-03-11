@@ -3,7 +3,31 @@ from numpy.linalg import inv
 from numpy.typing import NDArray, ArrayLike
 from typing import Optional
 
-def to_homogeneous(input_coords: ArrayLike) -> NDArray:
+def to_homogeneous_vector(input_vector: ArrayLike) -> NDArray:
+    '''
+    input_coords : NxD array where N is the number of points and D the number of dimensions
+    homogeneous_coords: Nx(D+1) homogeneous coordinates
+    '''
+    
+    # transform to numpy array
+    input_vector = np.asarray(input_vector)
+
+    # check shape
+    shp = input_vector.shape    
+    if len(shp) > 2:
+        raise ValueError('Expected NxD array')
+    
+    # add a column of ones
+    n = shp[0]
+    if len(shp) == 1:
+        homogeneous_coords = np.append(input_vector,0)
+    else:
+        new_colum = np.zeros((n,1))
+        homogeneous_coords = np.hstack((input_vector, new_colum))
+    
+    return homogeneous_coords
+
+def to_homogeneous_point(input_coords: ArrayLike) -> NDArray:
     '''
     input_coords : NxD array where N is the number of points and D the number of dimensions
     homogeneous_coords: Nx(D+1) homogeneous coordinates
@@ -27,12 +51,12 @@ def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     
     return homogeneous_coords
 
-def from_homogeneous(homogeneous_coords: ArrayLike) -> NDArray:
+def from_homogeneous(homogeneous: ArrayLike) -> NDArray:
 
     # transform to numpy array
-    homogeneous_coords = np.asarray(homogeneous_coords)
+    homogeneous = np.asarray(homogeneous)
 
-    return homogeneous_coords[:,:-1]    
+    return homogeneous[:,:-1]    
 
 class Affine2DTransform():
     
@@ -82,7 +106,7 @@ class Affine2DTransform():
     def inverse(T: NDArray) -> NDArray:
         return inv(T)
     
-def transform2d(T: Affine2DTransform, x: NDArray):
+def transform_point_2d(T: Affine2DTransform, x: NDArray):
     '''
     input: x is an array with shape (2,) , (1,2) or (N,2)
     output: returns an array with shape (1,2) or (N,2) 
@@ -94,7 +118,22 @@ def transform2d(T: Affine2DTransform, x: NDArray):
     elif x.ndim != 2 or x.shape[1] != 2:
         raise ValueError('Expected input shape (2,), (1,2), or (N,2), but got {}'.format(x.shape))
 
-    x_homogeneous = to_homogeneous(x)
+    x_homogeneous = to_homogeneous_point(x)
     y_homogeneous = T @ x_homogeneous.T
     return from_homogeneous(y_homogeneous.T)
 
+def transform_vector_2d(T: Affine2DTransform, v: NDArray):
+    '''
+    input: x is an array with shape (2,) , (1,2) or (N,2)
+    output: returns an array with shape (1,2) or (N,2) 
+    '''
+    
+    if v.shape == (2,):
+        v = v[np.newaxis, :]  # Convert (2,) to (1,2)
+
+    elif v.ndim != 2 or v.shape[1] != 2:
+        raise ValueError('Expected input shape (2,), (1,2), or (N,2), but got {}'.format(v.shape))
+
+    x_homogeneous = to_homogeneous_vector(v)
+    y_homogeneous = T @ x_homogeneous.T
+    return from_homogeneous(y_homogeneous.T)
