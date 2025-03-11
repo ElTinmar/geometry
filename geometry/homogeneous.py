@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy.typing import NDArray, ArrayLike
+from typing import Optional
 
 def to_homogeneous(input_coords: ArrayLike) -> NDArray:
     '''
@@ -65,7 +66,11 @@ class Affine2DTransform():
         return R
 
     @staticmethod
-    def scaling(sx: float, sy:float) -> NDArray:
+    def scaling(sx: float, sy: Optional[float] = None) -> NDArray:
+        
+        if sy is None:
+            sy = sx
+
         S = np.array([
             [ sx, 0.0, 0.0],
             [0.0,  sy, 0.0],
@@ -83,18 +88,11 @@ def transform2d(T: Affine2DTransform, x: NDArray):
     output: returns an array with shape (1,2) or (N,2) 
     '''
     
-    shp = x.shape
+    if x.shape == (2,):
+        x = x[np.newaxis, :]  # Convert (2,) to (1,2)
 
-    if len(shp) == 1 and shp[0] == 2:
-        # make it explicitly a 1x2 row vector 
-        x = x[np.newaxis,:]
-
-    elif len(shp) == 2 and shp[1] == 2:
-        # Nx2 array, nothing to do
-        pass
-
-    else:
-        return ValueError('Wrong shape, please provide an array with shape (2,) , (1,2) or (N,2)')
+    elif x.ndim != 2 or x.shape[1] != 2:
+        raise ValueError('Expected input shape (2,), (1,2), or (N,2), but got {}'.format(x.shape))
 
     x_homogeneous = to_homogeneous(x)
     y_homogeneous = T @ x_homogeneous.T
