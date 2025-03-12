@@ -21,7 +21,9 @@ class AffineTransform2D(np.ndarray):
             return
 
     def _transform(self, x: NDArray, homogeneous_column: Callable[[int], NDArray]) -> NDArray:
-
+        # input shape (2,) or (N,2)
+        # output shape (1,2) or (N,2) 
+        
         x = np.atleast_2d(x)  
         
         if x.shape[1] != 2:
