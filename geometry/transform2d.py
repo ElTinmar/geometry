@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Callable, Union
-from functools import cached_property
 
 class AffineTransform2D(np.ndarray):
 
@@ -191,9 +190,8 @@ class SimilarityTransform2D(AffineTransform2D):
         """Return the inverse of the similarity transformation."""
         return SimilarityTransform2D._from_array(np.linalg.inv(self))
     
-    @cached_property
+    @property
     def scale_factor(self) -> float:
-        U, S, Vt = np.linalg.svd(self[:2, :2])
-        return S[0]
+        return np.linalg.norm(self[:,0])
         
 
