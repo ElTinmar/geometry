@@ -12,7 +12,7 @@ X = np.random.multivariate_normal(mean, cov, 1000)
 def pca_sk(X):
     pca = PCA()
     scores = pca.fit_transform(X)     
-    return pca.components_
+    return pca.components_, scores
 """
 
 sklearn = "pca_sk(X)"
