@@ -2,6 +2,12 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Callable, Union
 
+def column_ones(n: int) -> NDArray:
+    return np.ones((n,1))
+
+def column_zeros(n: int) -> NDArray:
+    return np.zeros((n,1))
+
 class AffineTransform2D(np.ndarray):
 
     def __new__(cls) -> "AffineTransform2D":
@@ -40,10 +46,10 @@ class AffineTransform2D(np.ndarray):
         return x_transformed[:,:-1]
         
     def transform_points(self, points_2d: NDArray) -> NDArray:
-        return self._transform(points_2d, lambda x: np.ones((x,1)))
+        return self._transform(points_2d, column_ones)
 
     def transform_vectors(self, vectors_2d: NDArray) -> NDArray:
-        return self._transform(vectors_2d, lambda x: np.zeros((x,1)))
+        return self._transform(vectors_2d, column_zeros)
     
     def __matmul__(self, other: Union["AffineTransform2D", np.ndarray]) ->  Union["AffineTransform2D",np.ndarray]:
         
