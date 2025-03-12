@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='geometry',
     author='Martin Privat',
-    version='0.2.2',
+    version='0.2.3',
     packages=['geometry','geometry.tests'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     description='geometry functions',

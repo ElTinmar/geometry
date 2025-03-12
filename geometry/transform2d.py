@@ -34,7 +34,7 @@ class AffineTransform2D(np.ndarray):
 
         x_transformed = x_homogeneous @ self.T
 
-        return x_transformed[:,:-1].squeeze()
+        return x_transformed[:,:-1]
         
     def transform_points(self, points_2d: NDArray) -> NDArray:
         return self._transform(points_2d, lambda x: np.ones((x,1)))
