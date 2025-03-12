@@ -20,7 +20,7 @@ class AffineTransform2D(np.ndarray):
         if obj is None:
             return
 
-    def _transform(self, x: NDArray, homogeneous_column: Callable[[int], NDArray]):
+    def _transform(self, x: NDArray, homogeneous_column: Callable[[int], NDArray]) -> NDArray:
 
         x = np.atleast_2d(x)  
         
@@ -36,10 +36,10 @@ class AffineTransform2D(np.ndarray):
 
         return x_transformed[:,:-1].squeeze()
         
-    def transform_points(self, points_2d: NDArray):
+    def transform_points(self, points_2d: NDArray) -> NDArray:
         return self._transform(points_2d, lambda x: np.ones((x,1)))
 
-    def transform_vectors(self, vectors_2d: NDArray):
+    def transform_vectors(self, vectors_2d: NDArray) -> NDArray:
         return self._transform(vectors_2d, lambda x: np.zeros((x,1)))
     
     def __matmul__(self, other: Union["AffineTransform2D", np.ndarray]) -> "AffineTransform2D":
