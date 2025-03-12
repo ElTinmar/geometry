@@ -5,9 +5,9 @@ from geometry import pca
 import numpy as np
 from sklearn.decomposition import PCA
 
-mean = [0, 0]
-cov = [[1, 0], [0, 100]]
-X = np.random.multivariate_normal(mean, cov, 100)
+mean = [3, 10]
+cov = [[10, 25], [25, 100]]
+X = np.random.multivariate_normal(mean, cov, 1000)
 
 def pca_sk(X):
     pca = PCA()
