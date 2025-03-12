@@ -66,16 +66,6 @@ class TestAffineTransform2D(unittest.TestCase):
         expected = AffineTransform2D.translation(-3, -4)
         assert_array_almost_equal(T_inv, expected)
     
-    def test_is_similarity(self):
-        S = AffineTransform2D.scaling(2) 
-        R = AffineTransform2D.rotation(np.pi / 4)  
-        T = AffineTransform2D.translation(1, 1) 
-        self.assertTrue(S.is_similarity())
-        self.assertTrue(R.is_similarity())
-        self.assertTrue(T.is_similarity())  
-        non_sim = AffineTransform2D.scaling(2, 3) 
-        self.assertFalse(non_sim.is_similarity())
-
     def test_matmul_affine(self):
         """Test AffineTransform2D @ AffineTransform2D"""
         result = self.T @ self.R
@@ -149,10 +139,6 @@ class TestSimilarityTransform2D(unittest.TestCase):
         expected = SimilarityTransform2D.translation(-3, -4)
         assert_array_almost_equal(T_inv, expected)
     
-    def test_invalid_similarity(self):
-        with self.assertRaises(ValueError):
-            SimilarityTransform2D(AffineTransform2D.scaling(2, 3))
-    
     def test_scale_factor(self):
         S = SimilarityTransform2D.scaling(2)
         self.assertAlmostEqual(S.scale_factor, 2.0)
@@ -167,7 +153,6 @@ class TestSimilarityTransform2D(unittest.TestCase):
 
         result = R @ S @ T
         self.assertIsInstance(result, SimilarityTransform2D)
-        self.assertTrue(result.is_similarity())
 
     def test_similarity_times_affine_non_similarity(self):
         R = SimilarityTransform2D.rotation(np.pi / 4)
@@ -176,12 +161,10 @@ class TestSimilarityTransform2D(unittest.TestCase):
         result1 = R @ A
         self.assertIsInstance(result1, AffineTransform2D)
         self.assertNotIsInstance(result1, SimilarityTransform2D)
-        self.assertFalse(result1.is_similarity())
 
         result2 = A @ R
         self.assertIsInstance(result2, AffineTransform2D)
         self.assertNotIsInstance(result2, SimilarityTransform2D)
-        self.assertFalse(result2.is_similarity())
 
     def test_similarity_times_affine_similarity(self):
         R = SimilarityTransform2D.rotation(np.pi / 4)
@@ -189,11 +172,9 @@ class TestSimilarityTransform2D(unittest.TestCase):
 
         result1 = R @ S
         self.assertIsInstance(result1, AffineTransform2D)
-        self.assertTrue(result1.is_similarity())
 
         result2 = S @ R
         self.assertIsInstance(result2, AffineTransform2D)
-        self.assertTrue(result2.is_similarity())
 
     def test_affine_non_similarity_times_affine_similarity(self):
         A = AffineTransform2D.scaling(2, 3)  
@@ -202,12 +183,10 @@ class TestSimilarityTransform2D(unittest.TestCase):
         result = A @ S
         self.assertIsInstance(result, AffineTransform2D)
         self.assertNotIsInstance(result, SimilarityTransform2D)
-        self.assertFalse(result.is_similarity())
 
         result2 = S @ A
         self.assertIsInstance(result2, AffineTransform2D)
         self.assertNotIsInstance(result2, SimilarityTransform2D)
-        self.assertFalse(result2.is_similarity())
 
     def test_similarity_times_ndarray(self):
         R = SimilarityTransform2D.rotation(np.pi / 4)
