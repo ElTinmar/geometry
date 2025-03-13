@@ -34,7 +34,7 @@ class AffineTransform2D(np.ndarray):
         x_homogeneous[:,:2] = x
         x_homogeneous[:,2] = homogeneous_coord
 
-        x_transformed = x_homogeneous @ self.T
+        x_transformed = x_homogeneous @ np.asarray(self).T
 
         return x_transformed[:,:-1]
         
