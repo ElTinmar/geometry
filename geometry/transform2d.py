@@ -2,6 +2,30 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Union
 
+def homogeneous(X: NDArray, z: float = 0):
+
+    if X.ndim != 2:
+        raise ValueError(f'X must be a 2D array')
+    
+    shape_homogeneous = (X.shape[0], X.shape[1]+1)
+    X_homogeneous = np.empty(shape_homogeneous, dtype=X.dtype)
+    X_homogeneous[:,:-1] = X
+    X_homogeneous[:,-1] = z
+
+    return X_homogeneous
+
+def homogeneous_2d(X: NDArray, z: float = 0):
+    X = np.atleast_2d(X)
+    if X.shape[1] != 2:
+        raise ValueError(f'Expected input shape (2,) or (N,2), but got {X.shape}')
+    return homogeneous(X, z)
+
+def homogeneous_coord_2d(X: NDArray):
+    return homogeneous_2d(X, 1)
+
+def homogeneous_vec_2d(X: NDArray):
+    return homogeneous_2d(X, 0)
+    
 class AffineTransform2D(np.ndarray):
 
     def __new__(cls) -> "AffineTransform2D":
@@ -21,28 +45,17 @@ class AffineTransform2D(np.ndarray):
         
         return obj
         
-    def _transform(self, x: NDArray, homogeneous_coord: int) -> NDArray:
-        # input shape (2,) or (N,2)
-        # output shape (1,2) or (N,2) 
-        
-        x = np.atleast_2d(x)  
-        
-        if x.shape[1] != 2:
-            raise ValueError(f'Expected input shape (2,) or (N,2), but got {x.shape}')
-        
-        x_homogeneous = np.empty((x.shape[0], 3), dtype=np.float64)
-        x_homogeneous[:,:2] = x
-        x_homogeneous[:,2] = homogeneous_coord
-
-        x_transformed = x_homogeneous @ np.asarray(self).T
-
-        return x_transformed[:,:-1]
-        
     def transform_points(self, points_2d: NDArray) -> NDArray:
-        return self._transform(points_2d, homogeneous_coord = 1)
+
+        x_homogeneous = homogeneous_coord_2d(points_2d)
+        x_transformed = x_homogeneous @ np.asarray(self).T
+        return x_transformed[:,:-1]
 
     def transform_vectors(self, vectors_2d: NDArray) -> NDArray:
-        return self._transform(vectors_2d, homogeneous_coord = 0)
+        
+        x_homogeneous = homogeneous_vec_2d(vectors_2d)
+        x_transformed = x_homogeneous @ np.asarray(self).T
+        return x_transformed[:,:-1]
     
     def __matmul__(self, other: Union["AffineTransform2D", np.ndarray]) ->  Union["AffineTransform2D",np.ndarray]:
         
