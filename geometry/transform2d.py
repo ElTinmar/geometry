@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, Callable, Union
+from typing import Optional, Union
 
 class AffineTransform2D(np.ndarray):
 
