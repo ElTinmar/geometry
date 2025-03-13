@@ -2,12 +2,6 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Callable, Union
 
-def column_ones(n: int) -> NDArray:
-    return np.ones((n,1))
-
-def column_zeros(n: int) -> NDArray:
-    return np.zeros((n,1))
-
 class AffineTransform2D(np.ndarray):
 
     def __new__(cls) -> "AffineTransform2D":
@@ -27,7 +21,7 @@ class AffineTransform2D(np.ndarray):
         
         return obj
         
-    def _transform(self, x: NDArray, homogeneous_column: Callable[[int], NDArray]) -> NDArray:
+    def _transform(self, x: NDArray, homogeneous_coord: int) -> NDArray:
         # input shape (2,) or (N,2)
         # output shape (1,2) or (N,2) 
         
@@ -35,21 +29,20 @@ class AffineTransform2D(np.ndarray):
         
         if x.shape[1] != 2:
             raise ValueError(f'Expected input shape (2,) or (N,2), but got {x.shape}')
-
-        x_homogeneous = np.column_stack((
-            x, 
-            homogeneous_column(x.shape[0])
-        ))
+        
+        x_homogeneous = np.empty((x.shape[0], 3), dtype=np.float64)
+        x_homogeneous[:,:2] = x
+        x_homogeneous[:,2] = homogeneous_coord
 
         x_transformed = x_homogeneous @ self.T
 
         return x_transformed[:,:-1]
         
     def transform_points(self, points_2d: NDArray) -> NDArray:
-        return self._transform(points_2d, column_ones)
+        return self._transform(points_2d, homogeneous_coord = 1)
 
     def transform_vectors(self, vectors_2d: NDArray) -> NDArray:
-        return self._transform(vectors_2d, column_zeros)
+        return self._transform(vectors_2d, homogeneous_coord = 0)
     
     def __matmul__(self, other: Union["AffineTransform2D", np.ndarray]) ->  Union["AffineTransform2D",np.ndarray]:
         
