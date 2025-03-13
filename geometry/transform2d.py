@@ -187,8 +187,8 @@ class SimilarityTransform2D(AffineTransform2D):
     
     def inv(self) -> "SimilarityTransform2D":
         """Return the inverse of the similarity transformation."""
-        R_s = self[:2, :2]  
-        t = self[:2, 2]     
+        R_s = np.asarray(self[:2, :2])  
+        t = np.asarray(self[:2, 2])     
         scale = np.linalg.norm(R_s[:, 0]) 
         R_inv = R_s.T / (scale ** 2)
         t_inv = -R_inv @ t  
