@@ -37,7 +37,29 @@ class AffineTransform2D(np.ndarray):
             return
 
     @classmethod
+    def from_array(cls, input_array: NDArray) -> "AffineTransform2D":
+        # safe method that checks that the input array represents
+        # an invertible affine transformation
+
+        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+
+        if obj.shape != (3, 3):
+            raise ValueError("AffineTransform2D must be a 3x3 matrix.")
+        
+        if not np.array_equal(obj[2], [0, 0, 1]):
+            raise ValueError("Last row should be [0, 0, 1]")
+        
+        linear_part = obj[:2, :2]
+        det = np.linalg.det(linear_part)
+        if np.isclose(det, 0):
+            raise ValueError("Transform should be invertible")
+        
+        return obj
+
+    @classmethod
     def _from_array(cls, input_array: NDArray) -> "AffineTransform2D":
+        # this method is only to be used internally and trusts that 
+        # the input array is well behaved 
 
         obj = np.asarray(input_array, dtype=np.float64).view(cls)
         if obj.shape != (3, 3):
@@ -138,6 +160,35 @@ class AffineTransform2D(np.ndarray):
         return AffineTransform2D._from_array(np.linalg.inv(self))
 
 class SimilarityTransform2D(AffineTransform2D):
+
+    @classmethod
+    def from_array(cls, input_array: NDArray) -> "AffineTransform2D":
+        # safe method that checks that the input array represents
+        # an invertible affine transformation
+
+        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+
+        if obj.shape != (3, 3):
+            raise ValueError("Transform must be a 3x3 matrix.")
+        
+        if not np.array_equal(obj[2], [0, 0, 1]):
+            raise ValueError("Last row should be [0, 0, 1]")
+        
+        linear_part = obj[:2, :2]
+        det = np.linalg.det(linear_part)
+        if np.isclose(det, 0):
+            raise ValueError("Transform should be invertible")
+        
+        dot_product = np.dot(linear_part[:, 0], linear_part[:, 1])
+        if not np.isclose(dot_product, 0):
+            raise ValueError("The columns of the linear part must be orthogonal.")
+
+        norm_col0 = np.linalg.norm(linear_part[:, 0])
+        norm_col1 = np.linalg.norm(linear_part[:, 1])
+        if not np.isclose(norm_col0, norm_col1):
+            raise ValueError("The columns of the linear part must have equal norms.")
+        
+        return obj
     
     def __matmul__(self, other: Union["SimilarityTransform2D", "AffineTransform2D", np.ndarray]) ->  Union["SimilarityTransform2D","AffineTransform2D",np.ndarray]:
         
