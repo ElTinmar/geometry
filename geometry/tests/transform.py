@@ -110,6 +110,34 @@ class TestAffineTransform2D(unittest.TestCase):
         result = AffineTransform2D().scale(2).translate(1, 2)
         np.testing.assert_array_almost_equal(result, expected)
 
+    def test_valid_affine_transform(self):
+        matrix = np.array([
+            [1, 0, 2],
+            [0, 1, 3],
+            [0, 0, 1]
+        ])
+        transform = AffineTransform2D.from_array(matrix)
+        np.testing.assert_array_almost_equal(transform, matrix)
+
+    def test_invalid_shape(self):
+        matrix = np.array([
+            [1, 0, 2],
+            [0, 1, 3]
+        ])
+        with self.assertRaises(ValueError) as context:
+            AffineTransform2D.from_array(matrix)
+        self.assertEqual(str(context.exception), "AffineTransform2D must be a 3x3 matrix.")
+
+    def test_non_invertible_transform(self):
+        matrix = np.array([
+            [1, 2, 3],
+            [2, 4, 6],
+            [0, 0, 1]
+        ])
+        with self.assertRaises(ValueError) as context:
+            AffineTransform2D.from_array(matrix)
+        self.assertEqual(str(context.exception), "Transform should be invertible")
+
 class TestSimilarityTransform2D(unittest.TestCase):
     
     def test_identity(self):
@@ -215,6 +243,40 @@ class TestSimilarityTransform2D(unittest.TestCase):
         result = SimilarityTransform2D().scale(2).translate(1, 2)
         np.testing.assert_array_almost_equal(result, expected)
         self.assertIsInstance(result, SimilarityTransform2D)
+
+    def test_valid_similarity_transform(self):
+        angle = np.pi / 4  # 45 degrees
+        scale = 2
+        rotation_matrix = scale * np.array([
+            [np.cos(angle), -np.sin(angle)],
+            [np.sin(angle),  np.cos(angle)]
+        ])
+        matrix = np.eye(3)
+        matrix[:2, :2] = rotation_matrix
+        matrix[:2, 2] = [2, 3]
+        transform = SimilarityTransform2D.from_array(matrix)
+        np.testing.assert_array_almost_equal(transform, matrix)
+
+    def test_non_orthogonal_columns(self):
+        matrix = np.array([
+            [1, 1, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+        ])
+        with self.assertRaises(ValueError) as context:
+            SimilarityTransform2D.from_array(matrix)
+        self.assertEqual(str(context.exception), "The columns of the linear part must be orthogonal.")
+
+    def test_unequal_column_norms(self):
+        matrix = np.array([
+            [2, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+        ])
+        with self.assertRaises(ValueError) as context:
+            SimilarityTransform2D.from_array(matrix)
+        self.assertEqual(str(context.exception), "The columns of the linear part must have equal norms.")
+
 
 if __name__ == "__main__":
     unittest.main()
