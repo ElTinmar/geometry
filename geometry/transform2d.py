@@ -201,7 +201,7 @@ class SimilarityTransform2D(AffineTransform2D):
         # this method is only to be used internally and trusts that 
         # the input array is well behaved 
 
-        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+        obj = np.asarray(input_array, dtype=np.float32).view(cls)
         if obj.shape != (3, 3):
             raise ValueError("AffineTransform2D must be a 3x3 matrix.")
         
