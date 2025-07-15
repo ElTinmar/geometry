@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, Union
+from typing import Optional, Union, overload
 
 def homogeneous(X: NDArray, z: float = 0):
 
@@ -78,7 +78,13 @@ class AffineTransform2D(np.ndarray):
         x_homogeneous = homogeneous_vec_2d(vectors_2d)
         x_transformed = x_homogeneous @ np.asarray(self).T
         return x_transformed[:,:-1]
-    
+
+    @overload
+    def __matmul__(self, other: "AffineTransform2D") -> "AffineTransform2D": ...
+
+    @overload
+    def __matmul__(self, other: np.ndarray) -> np.ndarray: ...
+
     def __matmul__(self, other: Union["AffineTransform2D", np.ndarray]) ->  Union["AffineTransform2D",np.ndarray]:
         
         result = np.matmul(self, other)
@@ -162,7 +168,7 @@ class AffineTransform2D(np.ndarray):
 class SimilarityTransform2D(AffineTransform2D):
 
     @classmethod
-    def from_array(cls, input_array: NDArray) -> "AffineTransform2D":
+    def from_array(cls, input_array: NDArray) -> "SimilarityTransform2D":
         # safe method that checks that the input array represents
         # an invertible affine transformation
 
@@ -189,7 +195,27 @@ class SimilarityTransform2D(AffineTransform2D):
             raise ValueError("The columns of the linear part must have equal norms.")
         
         return obj
-    
+
+    @classmethod
+    def _from_array(cls, input_array: NDArray) -> "SimilarityTransform2D":
+        # this method is only to be used internally and trusts that 
+        # the input array is well behaved 
+
+        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+        if obj.shape != (3, 3):
+            raise ValueError("AffineTransform2D must be a 3x3 matrix.")
+        
+        return obj
+        
+    @overload
+    def __matmul__(self, other: "SimilarityTransform2D") -> "SimilarityTransform2D": ...
+
+    @overload
+    def __matmul__(self, other: AffineTransform2D) -> AffineTransform2D: ...
+
+    @overload
+    def __matmul__(self, other: np.ndarray) -> np.ndarray: ...
+
     def __matmul__(self, other: Union["SimilarityTransform2D", "AffineTransform2D", np.ndarray]) ->  Union["SimilarityTransform2D","AffineTransform2D",np.ndarray]:
         
         result = np.matmul(self, other)
