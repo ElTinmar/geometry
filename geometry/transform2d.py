@@ -29,7 +29,7 @@ def homogeneous_vec_2d(X: NDArray):
 class AffineTransform2D(np.ndarray):
 
     def __new__(cls) -> "AffineTransform2D":
-        return np.eye(3, dtype=np.float64).view(cls)
+        return np.eye(3, dtype=np.float32).view(cls)
 
     def __array_finalize__(self, obj):
         """Ensure attributes are inherited when slicing or viewing."""
@@ -41,7 +41,7 @@ class AffineTransform2D(np.ndarray):
         # safe method that checks that the input array represents
         # an invertible affine transformation
 
-        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+        obj = np.asarray(input_array, dtype=np.float32).view(cls)
 
         if obj.shape != (3, 3):
             raise ValueError("AffineTransform2D must be a 3x3 matrix.")
@@ -61,7 +61,7 @@ class AffineTransform2D(np.ndarray):
         # this method is only to be used internally and trusts that 
         # the input array is well behaved 
 
-        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+        obj = np.asarray(input_array, dtype=np.float32).view(cls)
         if obj.shape != (3, 3):
             raise ValueError("AffineTransform2D must be a 3x3 matrix.")
         
@@ -172,7 +172,7 @@ class SimilarityTransform2D(AffineTransform2D):
         # safe method that checks that the input array represents
         # an invertible affine transformation
 
-        obj = np.asarray(input_array, dtype=np.float64).view(cls)
+        obj = np.asarray(input_array, dtype=np.float32).view(cls)
 
         if obj.shape != (3, 3):
             raise ValueError("Transform must be a 3x3 matrix.")
