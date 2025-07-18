@@ -2,11 +2,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 def pca(X: NDArray):
-
-    X_centered = X - np.mean(X, axis=0)
+    mu = np.mean(X, axis=0)
+    X_centered = X - mu
     cov = X_centered.T @ X_centered
     _, eigenvectors = np.linalg.eigh(cov)
     components = eigenvectors[:, ::-1]
     scores = X_centered @ components
-    return components, scores
+    return mu, components, scores
 
